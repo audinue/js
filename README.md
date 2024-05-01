@@ -2,7 +2,6 @@
 
 Collection of my JavaScript modules ready to be imported anywhere.
 
-```js
-import Serializer from 'https://gitcdn.xyz/repo/audinue/js/master/serializer.js'
-
+```html
+<script src="https://cdn.jsdelivr.net/gh/audinue/js/patch.min.js"></script>
 ```
