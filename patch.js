@@ -3,7 +3,7 @@ function patch (current, next) {
     return
   }
   if (current.nodeName !== next.nodeName) {
-    current.parentNode.replaceChild(current, next)
+    current.parentNode.replaceChild(next, current)
     return
   }
   if (current.nodeType === 3) {
