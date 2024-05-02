@@ -28,9 +28,6 @@ function patch (current, next) {
     if (current.checked !== next.checked) {
       current.checked = next.checked
     }
-    if (current.open !== next.open) {
-      current.open = next.open
-    }
     if (current.value !== next.value) {
       current.value = next.value
     }
