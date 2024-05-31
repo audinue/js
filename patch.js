@@ -1,4 +1,4 @@
-function patch (current, next) {
+function patch(current, next) {
   if (current.isEqualNode(next)) {
     return
   }
@@ -42,7 +42,7 @@ function patch (current, next) {
         current.removeChild(current.childNodes[nextLength])
       }
     }
-    for (var i = 0; i < Math.min(currentLength, nextLength); i++) {
+    for (var i = Math.min(currentLength, nextLength) - 1; i > -1; i--) {
       patch(current.childNodes[i], next.childNodes[i])
     }
     return
