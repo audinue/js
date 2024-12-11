@@ -19,25 +19,17 @@ export class Response {
   }
 }
 
-const isTargetingSelf = (element) =>
-  element.target === "" || element.target === "_self";
-
-const useHash = () => origin() === "file://";
-
-const hashPath = () => (location.hash ? location.hash.substring(1) : "/");
-
-const origin = () => document.location.origin;
-
-const currentUrl = () =>
-  useHash() ? new URL(hashPath(), origin()) : new URL(location.href);
-
-const navigateUrl = (url) => new URL(url, currentUrl());
-
-const stateUrl = (url) => (useHash() ? "#" + new URL(url).pathname : url);
-
-const isSameOrigin = (url) => url.origin === origin();
-
 export const serve = (options) => {
+  const isTargetingSelf = (element) =>
+    element.target === "" || element.target === "_self";
+  const useHash = () => options.hash || origin() === "file://";
+  const hashPath = () => (location.hash ? location.hash.substring(1) : "/");
+  const origin = () => document.location.origin;
+  const currentUrl = () =>
+    useHash() ? new URL(hashPath(), origin()) : new URL(location.href);
+  const navigateUrl = (url) => new URL(url, currentUrl());
+  const stateUrl = (url) => (useHash() ? "#" + new URL(url).pathname : url);
+  const isSameOrigin = (url) => url.origin === origin();
   const listeners = [];
   const listen = (type, callback) => {
     addEventListener(type, callback);
@@ -60,12 +52,17 @@ export const serve = (options) => {
   const initialize = () => {
     const root = document.querySelector(options.root ?? "body");
     const navigate = async (request) => {
-      const { body, url } = await fetch(request);
-      root.innerHTML = body;
-      if (request.state === "replace") {
-        history.replaceState(body, "", url);
-      } else {
-        history.pushState(body, "", url);
+      try {
+        root.classList.add("loading");
+        const { body, url } = await fetch(request);
+        root.innerHTML = body;
+        if (request.state === "replace") {
+          history.replaceState(body, "", url);
+        } else {
+          history.pushState(body, "", url);
+        }
+      } finally {
+        root.classList.remove("loading");
       }
     };
     const navigateOnLoad = () =>
@@ -115,16 +112,19 @@ export const serve = (options) => {
       }
       navigateOnLoad();
     };
-    const renderState = (event) => {
+    const popState = (event) => {
       if (event.state === null) {
         return;
       }
       root.innerHTML = event.state;
+      if (options.revalidate) {
+        navigateOnLoad();
+      }
     };
     listen("click", navigateOnClick);
     listen("submit", navigateOnSubmit);
     listen("hashchange", navigateOnHashChange);
-    listen("popstate", renderState);
+    listen("popstate", popState);
     navigateOnLoad();
   };
   if (document.readyState === "loading") {
