@@ -27,7 +27,7 @@ export const route = (options) => {
   const routes = { value: [] };
   const reset = (value) => {
     routes.value = compile([
-      ...options.routes,
+      ...value,
       {
         path: "/404",
         page({ request }) {
@@ -36,7 +36,7 @@ export const route = (options) => {
       },
       {
         path: "/500",
-        page({ request, error }) {
+        page({ error }) {
           console.error(error);
           return `<pre>${error.stack}</pre>`;
         },
